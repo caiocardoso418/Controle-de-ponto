@@ -152,5 +152,81 @@ function printCurrentHour() {
     horaMinSeg.textContent = getCurrentHour();
 }
 
+const btnBaterPontoAntigo = document.getElementById("btn-bater-ponto-antigo");
+const dialogPontoAntigo = document.getElementById("dialog-ponto-antigo");
+const btnDialogFecharAntigo = document.getElementById("btn-dialog-fechar-antigo");
+const btnDialogBaterPontoAntigo = document.getElementById("btn-dialog-bater-ponto-antigo");
+
+btnBaterPontoAntigo.addEventListener("click", () => {
+    dialogPontoAntigo.showModal();
+});
+
+btnDialogFecharAntigo.addEventListener("click", () => {
+    dialogPontoAntigo.close();
+});
+
+btnDialogBaterPontoAntigo.addEventListener("click", () => {
+    const dataPontoAntigo = document.getElementById("data-antigo").value;
+    const observacaoAntigo = document.getElementById("observacao-ponto-antigo").value;
+    const dataAtual = new Date(); 
+    if (!dataPontoAntigo) {
+        alert("Por favor, selecione uma data.");
+        return;
+    }
+
+    const dataSelecionada = new Date(dataPontoAntigo);
+
+    if (dataSelecionada > dataAtual) {
+        alert("Não é permitido registrar um ponto em uma data futura.");
+        return;
+    }
+
+    let pontoAntigo = {
+        "data": dataPontoAntigo,
+        "hora": getCurrentHour(), 
+        "id": registerLocalStorage.length + 1,
+        "tipo": "ponto antigo",
+        "observacao": observacaoAntigo || "",
+        "isRetroativo": true 
+    };
+
+    saveRegisterLocalStorage(pontoAntigo);
+    dialogPontoAntigo.close(); 
+
+    alert("Ponto antigo registrado com sucesso!");
+
+   
+    gerarRelatorio();
+});
+
+function saveRegisterLocalStorage(register) {
+    registerLocalStorage.push(register); 
+    localStorage.setItem("register", JSON.stringify(registerLocalStorage)); 
+}
+
+function gerarRelatorio() {
+    const registros = getRegisterLocalStorage(); 
+    const relatorioDiv = document.getElementById("relatorio");
+
+    relatorioDiv.innerHTML = ""; 
+
+    registros.forEach(reg => {
+        const registroDiv = document.createElement("div");
+        registroDiv.classList.add("registro");
+
+        if (reg.isRetroativo) {
+            registroDiv.classList.add("retroativo");
+        }
+
+        registroDiv.innerHTML = `
+            <p>Data: ${reg.data} - Hora: ${reg.hora} - Tipo: ${reg.tipo}</p>
+            <p>Observação: ${reg.observacao}</p>
+        `;
+
+        relatorioDiv.appendChild(registroDiv);
+    });
+}
+
+
 printCurrentHour();
 setInterval(printCurrentHour, 1000);

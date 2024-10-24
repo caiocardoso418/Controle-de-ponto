@@ -35,8 +35,22 @@
         <p id="dialog-last-register"></p>
         <button id="btn-dialog-fechar">X</button>
     </dialog>
-    <!-- TO-DO: -->
-    <!-- criar histórico dos últimos n registros-->
+    <div id="div-btn-bater-ponto">
+        <button id="btn-bater-ponto-antigo">Bater ponto antigo!</button>
+    </div>
+    <dialog id="dialog-ponto-antigo">
+        <p id="dialog-data-antigo"></p>
+        <p id="dialog-hora-antigo"></p>
+        
+        <label for="data-antigo">Data do ponto:</label>
+        <input type="date" id="data-antigo">
+    
+        <textarea id="observacao-ponto-antigo" placeholder="Adicione uma observação"></textarea>
+    
+        <button id="btn-dialog-bater-ponto-antigo">Registrar ponto antigo</button>
+        <button id="btn-dialog-fechar-antigo">X</button>
+    </dialog>
+        
     <script src="js/index.js"></script>
 </body>
 </html>
