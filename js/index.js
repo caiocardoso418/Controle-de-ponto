@@ -58,30 +58,25 @@ btnCloseAlertRegister.addEventListener("click", () => {
 
 const btnDialogBaterPonto = document.getElementById("btn-dialog-bater-ponto");
 btnDialogBaterPonto.addEventListener("click", async () => {
-    const typeRegister = document.getElementById("tipos-ponto");
-    let lastTypeRegister = localStorage.getItem("lastTypeRegister");
-
-    console.log(lastTypeRegister);
-
+    const typeRegister = document.getElementById("tipos-ponto").value;
+    const observacaoRegistro = document.getElementById("observacao-registro").value; // Captura a observação
+    
     let userCurrentPosition = await getCurrentPosition();
 
     let ponto = {
         "data": getCurrentDate(),
         "hora": getCurrentHour(),
         "localizacao": userCurrentPosition,
-        "id": 1,
-        "tipo": typeRegister.value
-    }
-
-    console.log(ponto);
+        "id": registerLocalStorage.length + 1,
+        "tipo": typeRegister,
+        "observacao": observacaoRegistro || "" // Armazena a observação
+    };
 
     saveRegisterLocalStorage(ponto);
 
-    localStorage.setItem("lastDateRegister", ponto.data);
-    localStorage.setItem("lastTimeRegister", ponto.hora);
-
     dialogPonto.close();
 
+    // Mostra a confirmação
     divAlertaRegistroPonto.classList.remove("hidden");
     divAlertaRegistroPonto.classList.add("show");
 
@@ -89,15 +84,15 @@ btnDialogBaterPonto.addEventListener("click", async () => {
         divAlertaRegistroPonto.classList.remove("show");
         divAlertaRegistroPonto.classList.add("hidden");
     }, 5000);
-
 });
 
+// Atualiza a função de salvar registro para incluir observação
 function saveRegisterLocalStorage(register) {
-    const typeRegister = document.getElementById("tipos-ponto");
-    registerLocalStorage.push(register); // Array
+    registerLocalStorage.push(register);
     localStorage.setItem("register", JSON.stringify(registerLocalStorage));
-    localStorage.setItem("lastTypeRegister", typeRegister.value);
-} 
+    localStorage.setItem("lastTypeRegister", register.tipo);
+}
+
 
 function getRegisterLocalStorage() {
     let registers = localStorage.getItem("register");
@@ -304,6 +299,55 @@ btnToggleRelatorio.addEventListener("click", () => {
     }
 });
 
+// Função para mostrar/ocultar o histórico completo
+const btnToggleHistorico = document.getElementById("btn-toggle-historico");
+const historicoCompletoDiv = document.getElementById("historico-completo");
+
+btnToggleHistorico.addEventListener("click", () => {
+    if (historicoCompletoDiv.style.display === "none") {
+        historicoCompletoDiv.style.display = "block";
+        gerarHistoricoCompleto();
+        btnToggleHistorico.textContent = "Ocultar Histórico Completo";
+    } else {
+        historicoCompletoDiv.style.display = "none";
+        btnToggleHistorico.textContent = "Ver Histórico Completo";
+    }
+});
+
+// Função para gerar o histórico completo de registros
+function gerarHistoricoCompleto() {
+    const registrosDiv = document.getElementById("registros");
+    registrosDiv.innerHTML = "";
+
+    const registros = getRegisterLocalStorage();
+    
+    registros.forEach((reg, index) => {
+        const registroDiv = document.createElement("div");
+        registroDiv.classList.add("registro");
+        if (reg.observacao) {
+            registroDiv.classList.add("observacao");
+        }
+
+        registroDiv.innerHTML = `
+            <p><strong>Data:</strong> ${reg.data} - <strong>Hora:</strong> ${reg.hora} - <strong>Tipo:</strong> ${reg.tipo}</p>
+            <p><strong>Observação:</strong> ${reg.observacao || "Sem observação"}</p>
+            <button onclick="adicionarObservacao(${index})">Adicionar/Editar Observação</button>
+        `;
+        registrosDiv.appendChild(registroDiv);
+    });
+}
+
+// Função para adicionar ou editar observação em um registro
+function adicionarObservacao(index) {
+    const observacao = prompt("Digite uma observação para este registro:");
+    if (observacao !== null) {
+        let registros = getRegisterLocalStorage();
+        registros[index].observacao = observacao;
+        localStorage.setItem("register", JSON.stringify(registros));
+        gerarHistoricoCompleto();
+        alert("Observação adicionada com sucesso!");
+    }
+}
 
 
 // Chamar a função para carregar o histórico ao carregar a página
