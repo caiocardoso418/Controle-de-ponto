@@ -1,77 +1,178 @@
-.data-hora {
-    text-align: center;
-    font-family: "Nanum Gothic Coding", monospace;
-    font-weight: 400;
-    font-style: normal;
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-#btn-dialog-fechar {
-    position: absolute;
-    top: 0;
-    right: 0;
+/* Estilos gerais */
+body {
+    font-family: 'Nanum Gothic Coding', monospace;
+    background-color: #e9f2f5; /* Fundo suave */
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    min-height: 100vh;
 }
 
 #alerta-registro-ponto {
     position: fixed;
-    bottom: 20px;
+    top: 20px;
     right: 20px;
-    background-color: green;
-    padding: 20px;
+    background-color: #dff0d8;
+    color: #3c763d;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    display: none; /* Oculto por padrão */
+    align-items: center;
 }
 
-#alerta-registro-ponto p {
+#alerta-registro-ponto.visible {
+    display: flex; /* Exibe o alerta quando a classe 'visible' é adicionada */
+}
+
+/* Data e Hora */
+.data-hora {
+    font-size: 1.5rem; /* Aumentado */
+    color: #2c3e50;
     text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Botões principais */
+button {
+    background-color: #007bff;
     color: white;
-    font-size: 1.1rem;
-    text-align: center;
-    font-family: "Nanum Gothic Coding", monospace;
-    font-weight: 400;
-    font-style: normal;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.2rem; /* Aumentado */
+    transition: background-color 0.3s;
 }
 
-
-#alerta-registro-ponto-fechar {
-    position: absolute;
-    top: 0;
-    right: 0;
+button:hover {
+    background-color: #0056b3;
 }
 
-.hidden {
-    opacity: 0;
-}
-
-.show {
-    opacity: 1;
-}
-
-
-#div-btn-bater-ponto {
-    text-align: center;
-}
-
+/* Estilo para botão de "Bater Ponto" */
 #btn-bater-ponto {
+    font-size: 1.4rem;
+    padding: 15px 35px;
+    background-color: #28a745;
+    position: relative;
+    margin-bottom: 10px;
+}
+
+#btn-bater-ponto:hover {
+    background-color: #218838;
+}
+
+/* Botão "Bater Ponto Antigo" */
+#btn-bater-ponto-antigo {
+    font-size: 1rem; /* Menor que o principal */
+    padding: 10px 25px;
+    background-color: #17a2b8;
+    position: relative;
+}
+
+#btn-bater-ponto-antigo:hover {
+    background-color: #117a8b;
+}
+
+/* Estilos para diálogo */
+dialog {
     padding: 20px;
-    background-color: blue;
-    color: white;
-    font-size: 1.3rem;
-    border: 0px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    background-color: #ffffff;
+    width: 80%;
+    max-width: 400px;
 }
 
-.data-hora p {
-    font-size: 2rem; 
+dialog p, dialog label, dialog h3 {
+    margin-bottom: 10px;
+    color: #333;
 }
 
-#dialog-ponto p {
-    font-size: 1.5rem;
-    text-align: center;
+dialog textarea {
+    width: 100%;
+    min-height: 60px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: vertical;
 }
 
-#dialog-ponto select {
+/* Relatório de registros */
+#secao-relatorio {
+    width: 100%;
+    max-width: 600px;
+    margin-top: 20px;
+}
+
+#relatorio {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
     padding: 20px;
-    font-size: 1.3rem;
 }
 
-#btn-dialog-bater-ponto {
-    padding: 20px;
-    font-size: 1.3rem;
+.registro {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.registro:last-child {
+    border-bottom: none;
+}
+
+.registro p {
+    margin-bottom: 5px;
+}
+
+.observacao {
+    color: #007bff;
+}
+
+/* Reposicionamento de botões no rodapé */
+#btn-abrir-justificativa,
+#btn-toggle-relatorio {
+    position: fixed;
+    left: 20px;
+    font-size: 1.1rem;
+    padding: 10px 20px;
+}
+
+#btn-abrir-justificativa {
+    bottom: 80px;
+    background-color: #ffc107;
+}
+
+#btn-abrir-justificativa:hover {
+    background-color: #e0a800;
+}
+
+#btn-toggle-relatorio {
+    bottom: 20px; /* Ajustado para evitar sobreposição */
+    background-color: #17a2b8;
+}
+
+#btn-toggle-relatorio:hover {
+    background-color: #117a8b;
+}
+
+/* Botões de filtro */
+button[onclick*="filtrarRegistros"] {
+    background-color: #ffc107;
+    color: #333;
+    margin-right: 10px;
+}
+
+button[onclick*="filtrarRegistros"]:hover {
+    background-color: #e0a800;
 }

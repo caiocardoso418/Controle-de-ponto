@@ -233,11 +233,45 @@ function gerarRelatorioFiltrado(registros) {
     `).join("");
 }
 
+// Função para mostrar o alerta de ponto registrado
+function mostrarAlertaPonto() {
+    const alerta = document.getElementById("alerta-registro-ponto");
+    alerta.classList.add("visible"); // Exibe o alerta
+
+    // Oculta o alerta automaticamente após 3 segundos
+    setTimeout(() => {
+        alerta.classList.remove("visible");
+    }, 3000);
+}
+
+// Botão "Bater ponto"
+document.getElementById("btn-dialog-bater-ponto")?.addEventListener("click", () => {
+    const typeRegister = document.getElementById("tipos-ponto").value;
+    const observacao = document.getElementById("observacao-registro").value;
+    
+    const ponto = {
+        data: getCurrentDate(),
+        hora: getCurrentHour(),
+        tipo: typeRegister,
+        observacao: observacao || ""
+    };
+
+    saveRegisterLocalStorage(ponto);
+    document.getElementById("dialog-ponto").close();
+    mostrarAlertaPonto(); // Chama a função para exibir o alerta
+});
+
+// Fechar alerta manualmente ao clicar no botão "X"
+document.getElementById("alerta-registro-ponto-fechar").addEventListener("click", () => {
+    document.getElementById("alerta-registro-ponto").classList.remove("visible");
+});
+
+
+
 // Inicialização ao carregar a página
 window.onload = () => {
     printCurrentHour();
     gerarRelatorio();
-    gerarRelatorioJustificativas();
 };
 
 
