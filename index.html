@@ -63,14 +63,20 @@
         <button id="btn-fechar-justificativa">Cancelar</button>
     </dialog>
     
-    <!-- Botão para mostrar/ocultar o relatório -->
+        <!-- Botão para mostrar/ocultar o relatório de registros -->
     <button id="btn-toggle-relatorio">Ver Relatório de Registros</button>
 
-    <!-- Div para o relatório de registros -->
-    <div id="relatorio" style="display: none;">
-        <h3>Relatório de Registros</h3>
+    <!-- Div para o relatório de registros e os botões de filtro -->
+    <div id="secao-relatorio" style="display: none;">
+        <!-- Botões de filtro por período -->
+        <button onclick="filtrarRegistros('ultimaSemana')">Última Semana</button>
+        <button onclick="filtrarRegistros('ultimoMes')">Último Mês</button>
+        
+        <!-- Relatório de registros -->
+        <div id="relatorio">
+            <h3>Relatório de Registros</h3>
+        </div>
     </div>
-    
 
 
 

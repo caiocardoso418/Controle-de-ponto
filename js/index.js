@@ -1,135 +1,11 @@
-// TO-DO:
-// Organizar código-fonte
-
+// Exibição contínua da data e hora
 const diaSemana = document.getElementById("dia-semana");
 const diaMesAno = document.getElementById("dia-mes-ano");
 const horaMinSeg = document.getElementById("hora-min-seg");
 
-const btnBaterPonto = document.getElementById("btn-bater-ponto");
-btnBaterPonto.addEventListener("click", register);
-
-const dialogPonto = document.getElementById("dialog-ponto");
-
-const btnDialogFechar = document.getElementById("btn-dialog-fechar");
-btnDialogFechar.addEventListener("click", () => {
-    dialogPonto.close();
-});
-
-const nextRegister = {
-    "entrada": "intervalo",
-    "intervalo": "volta-intervalo", 
-    "volta-intervalo": "saida", 
-    "saida": "entrada"
-}
-
-let registerLocalStorage = getRegisterLocalStorage();
-
-const dialogData = document.getElementById("dialog-data");
-const dialogHora = document.getElementById("dialog-hora");
-
-const divAlertaRegistroPonto = document.getElementById("alerta-registro-ponto");
-
-diaSemana.textContent = getWeekDay();
-diaMesAno.textContent = getCurrentDate();
-
-
-async function getCurrentPosition() {
-    return new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition((position) => {
-            let userLocation = {
-                "latitude": position.coords.latitude,
-                "longitude": position.coords.longitude
-            }
-            resolve(userLocation);
-        },
-        (error) => {
-            reject("Erro ao recuperar a localização " + error);
-        });
-    });
-}
-
-// TO-DO:
-// Problema: os 5 segundos continuam contando
-const btnCloseAlertRegister = document.getElementById("alerta-registro-ponto-fechar");
-btnCloseAlertRegister.addEventListener("click", () => {
-    divAlertaRegistroPonto.classList.remove("show");
-    divAlertaRegistroPonto.classList.add("hidden");
-});
-
-const btnDialogBaterPonto = document.getElementById("btn-dialog-bater-ponto");
-btnDialogBaterPonto.addEventListener("click", async () => {
-    const typeRegister = document.getElementById("tipos-ponto").value;
-    const observacaoRegistro = document.getElementById("observacao-registro").value; // Captura a observação
-    
-    let userCurrentPosition = await getCurrentPosition();
-
-    let ponto = {
-        "data": getCurrentDate(),
-        "hora": getCurrentHour(),
-        "localizacao": userCurrentPosition,
-        "id": registerLocalStorage.length + 1,
-        "tipo": typeRegister,
-        "observacao": observacaoRegistro || "" // Armazena a observação
-    };
-
-    saveRegisterLocalStorage(ponto);
-
-    dialogPonto.close();
-
-    // Mostra a confirmação
-    divAlertaRegistroPonto.classList.remove("hidden");
-    divAlertaRegistroPonto.classList.add("show");
-
-    setTimeout(() => {
-        divAlertaRegistroPonto.classList.remove("show");
-        divAlertaRegistroPonto.classList.add("hidden");
-    }, 5000);
-});
-
-// Atualiza a função de salvar registro para incluir observação
-function saveRegisterLocalStorage(register) {
-    registerLocalStorage.push(register);
-    localStorage.setItem("register", JSON.stringify(registerLocalStorage));
-    localStorage.setItem("lastTypeRegister", register.tipo);
-}
-
-
-function getRegisterLocalStorage() {
-    let registers = localStorage.getItem("register");
-
-    if(!registers) {
-        return [];
-    }
-
-    return JSON.parse(registers); 
-}
-
-// TO-DO:
-// alterar o nome da função
-function register() {
-    dialogData.textContent = "Data: " + getCurrentDate();
-    dialogHora.textContent = "Hora: " + getCurrentHour();
-    
-    let lastTypeRegister = localStorage.getItem("lastTypeRegister");
-    if(lastTypeRegister) {
-        const typeRegister   = document.getElementById("tipos-ponto");
-        typeRegister.value   = nextRegister[lastTypeRegister];
-        let lastRegisterText = "Último registro: " + localStorage.getItem("lastDateRegister") + " - " + localStorage.getItem("lastTimeRegister") + " | " + localStorage.getItem("lastTypeRegister")
-        document.getElementById("dialog-last-register").textContent = lastRegisterText;
-    }
-
-    // TO-DO
-    // Como "matar" o intervalo a cada vez que o dialog é fechado?
-    setInterval(() => {
-        dialogHora.textContent = "Hora: " + getCurrentHour();
-    }, 1000);
-
-    dialogPonto.showModal();
-}
-
 function getWeekDay() {
     const date = new Date();
-    let days = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+    const days = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
     return days[date.getDay()];
 }
 
@@ -140,224 +16,229 @@ function getCurrentHour() {
 
 function getCurrentDate() {
     const date = new Date();
-    return String(date.getDate()).padStart(2, '0') + "/" + String((date.getMonth() + 1)).padStart(2, '0') + "/" + String(date.getFullYear()).padStart(2, '0');
+    return String(date.getDate()).padStart(2, '0') + "/" + String(date.getMonth() + 1).padStart(2, '0') + "/" + date.getFullYear();
 }
 
 function printCurrentHour() {
     horaMinSeg.textContent = getCurrentHour();
+    diaSemana.textContent = getWeekDay();
+    diaMesAno.textContent = getCurrentDate();
 }
 
-const btnBaterPontoAntigo = document.getElementById("btn-bater-ponto-antigo");
-const dialogPontoAntigo = document.getElementById("dialog-ponto-antigo");
-const btnDialogFecharAntigo = document.getElementById("btn-dialog-fechar-antigo");
-const btnDialogBaterPontoAntigo = document.getElementById("btn-dialog-bater-ponto-antigo");
+// Atualiza a hora a cada segundo
+setInterval(printCurrentHour, 1000);
 
-btnBaterPontoAntigo.addEventListener("click", () => {
-    dialogPontoAntigo.showModal();
+// Botão "Bater ponto"
+document.getElementById("btn-bater-ponto")?.addEventListener("click", () => {
+    document.getElementById("dialog-ponto").showModal();
 });
 
-btnDialogFecharAntigo.addEventListener("click", () => {
-    dialogPontoAntigo.close();
+// Botão para fechar o diálogo de ponto
+document.getElementById("btn-dialog-fechar")?.addEventListener("click", () => {
+    document.getElementById("dialog-ponto").close();
 });
 
-btnDialogBaterPontoAntigo.addEventListener("click", () => {
+// Botão "Bater ponto antigo"
+document.getElementById("btn-bater-ponto-antigo")?.addEventListener("click", () => {
+    document.getElementById("dialog-ponto-antigo").showModal();
+});
+
+document.getElementById("btn-dialog-fechar-antigo")?.addEventListener("click", () => {
+    document.getElementById("dialog-ponto-antigo").close();
+});
+
+// Justificativa de ausência
+document.getElementById("btn-abrir-justificativa")?.addEventListener("click", () => {
+    document.getElementById("dialog-justificativa").showModal();
+});
+
+document.getElementById("btn-fechar-justificativa")?.addEventListener("click", () => {
+    document.getElementById("dialog-justificativa").close();
+});
+
+// Salvar ponto
+document.getElementById("btn-dialog-bater-ponto")?.addEventListener("click", () => {
+    const typeRegister = document.getElementById("tipos-ponto").value;
+    const observacao = document.getElementById("observacao-registro").value;
+    
+    const ponto = {
+        data: getCurrentDate(),
+        hora: getCurrentHour(),
+        tipo: typeRegister,
+        observacao: observacao || ""
+    };
+
+    saveRegisterLocalStorage(ponto);
+    document.getElementById("dialog-ponto").close();
+    alert("Ponto registrado com sucesso!");
+});
+
+// Salvar ponto antigo
+document.getElementById("btn-dialog-bater-ponto-antigo")?.addEventListener("click", () => {
     const dataPontoAntigo = document.getElementById("data-antigo").value;
     const observacaoAntigo = document.getElementById("observacao-ponto-antigo").value;
-    const dataAtual = new Date(); 
-    if (!dataPontoAntigo) {
-        alert("Por favor, selecione uma data.");
+    const dataAtual = new Date();
+    
+    if (!dataPontoAntigo || new Date(dataPontoAntigo) > dataAtual) {
+        alert("Data inválida. Por favor, selecione uma data válida.");
         return;
     }
 
-    const dataSelecionada = new Date(dataPontoAntigo);
-
-    if (dataSelecionada > dataAtual) {
-        alert("Não é permitido registrar um ponto em uma data futura.");
-        return;
-    }
-
-    let pontoAntigo = {
-        "data": dataPontoAntigo,
-        "hora": getCurrentHour(), 
-        "id": registerLocalStorage.length + 1,
-        "tipo": "ponto antigo",
-        "observacao": observacaoAntigo || "",
-        "isRetroativo": true 
+    const pontoAntigo = {
+        data: dataPontoAntigo,
+        hora: getCurrentHour(),
+        tipo: "ponto antigo",
+        observacao: observacaoAntigo || ""
     };
 
     saveRegisterLocalStorage(pontoAntigo);
-    dialogPontoAntigo.close(); 
-
+    document.getElementById("dialog-ponto-antigo").close();
     alert("Ponto antigo registrado com sucesso!");
-
-   
     gerarRelatorio();
 });
 
-function saveRegisterLocalStorage(register) {
-    registerLocalStorage.push(register); 
-    localStorage.setItem("register", JSON.stringify(registerLocalStorage)); 
-}
-
-function gerarRelatorio() {
-    const registros = getRegisterLocalStorage(); 
-    const relatorioDiv = document.getElementById("relatorio");
-
-    relatorioDiv.innerHTML = ""; 
-
-    registros.forEach(reg => {
-        const registroDiv = document.createElement("div");
-        registroDiv.classList.add("registro");
-
-        if (reg.isRetroativo) {
-            registroDiv.classList.add("retroativo");
-        }
-
-        registroDiv.innerHTML = `
-            <p>Data: ${reg.data} - Hora: ${reg.hora} - Tipo: ${reg.tipo}</p>
-            <p>Observação: ${reg.observacao}</p>
-        `;
-
-        relatorioDiv.appendChild(registroDiv);
-    });
-}
-
-const btnAbrirJustificativa = document.getElementById("btn-abrir-justificativa");
-const dialogJustificativa = document.getElementById("dialog-justificativa");
-const btnFecharJustificativa = document.getElementById("btn-fechar-justificativa");
-const btnEnviarJustificativa = document.getElementById("btn-enviar-justificativa");
-
-// Evento para abrir o diálogo de justificativa
-btnAbrirJustificativa.addEventListener("click", () => {
-    dialogJustificativa.showModal();
-});
-
-// Evento para fechar o diálogo de justificativa
-btnFecharJustificativa.addEventListener("click", () => {
-    dialogJustificativa.close();
-});
-
-// Evento para enviar a justificativa
-btnEnviarJustificativa.addEventListener("click", () => {
+// Salvar justificativa
+document.getElementById("btn-enviar-justificativa")?.addEventListener("click", () => {
     const justificativa = document.getElementById("justificativa-ausencia").value;
-    const arquivo = document.getElementById("upload-arquivo").files[0]; // Pega o arquivo carregado
+    const arquivo = document.getElementById("upload-arquivo").files[0];
 
     if (!justificativa || !arquivo) {
         alert("Por favor, forneça uma justificativa e anexe um arquivo.");
         return;
     }
 
-    // Salvando a justificativa e o arquivo no LocalStorage (ou backend)
     const justificativaAusencia = {
-        "data": getCurrentDate(),
-        "hora": getCurrentHour(),
-        "justificativa": justificativa,
-        "arquivo": arquivo.name // Armazena apenas o nome do arquivo para visualização
+        data: getCurrentDate(),
+        hora: getCurrentHour(),
+        justificativa: justificativa,
+        arquivo: arquivo.name
     };
 
-    // Adiciona a justificativa ao LocalStorage (poderia ser enviado a um backend)
-    let justificativas = JSON.parse(localStorage.getItem("justificativas")) || [];
+    const justificativas = JSON.parse(localStorage.getItem("justificativas")) || [];
     justificativas.push(justificativaAusencia);
     localStorage.setItem("justificativas", JSON.stringify(justificativas));
 
+    document.getElementById("dialog-justificativa").close();
     alert("Justificativa registrada com sucesso!");
-    dialogJustificativa.close();
+    gerarRelatorioJustificativas();
 });
 
-function gerarRelatorioJustificativas() {
-    const justificativasDiv = document.getElementById("relatorio-justificativas");
-    justificativasDiv.innerHTML = ""; // Limpa o conteúdo atual
-
-    const justificativas = JSON.parse(localStorage.getItem("justificativas")) || [];
-    
-    justificativas.forEach(justif => {
-        const justificativaDiv = document.createElement("div");
-        justificativaDiv.classList.add("justificativa");
-        
-        justificativaDiv.innerHTML = `
-            <p>Data: ${justif.data} - Hora: ${justif.hora}</p>
-            <p>Justificativa: ${justif.justificativa}</p>
-            <p>Arquivo: ${justif.arquivo}</p>
-        `;
-
-        justificativasDiv.appendChild(justificativaDiv);
-    });
+// Função para salvar registro no LocalStorage
+function saveRegisterLocalStorage(register) {
+    const registros = JSON.parse(localStorage.getItem("register")) || [];
+    registros.push(register);
+    localStorage.setItem("register", JSON.stringify(registros));
 }
 
+// Referências aos elementos de botão e relatório
 const btnToggleRelatorio = document.getElementById("btn-toggle-relatorio");
-const relatorioDiv = document.getElementById("relatorio");
+const secaoRelatorio = document.getElementById("secao-relatorio");
 
-btnToggleRelatorio.addEventListener("click", () => {
-    // Verifica se o relatório está oculto
-    if (relatorioDiv.style.display === "none" || relatorioDiv.style.display === "") {
-        relatorioDiv.style.display = "block"; // Exibe o relatório
-        gerarRelatorio(); // Gera o relatório apenas quando é exibido
+// Evento para mostrar ou ocultar o relatório junto com os botões de filtro
+btnToggleRelatorio?.addEventListener("click", () => {
+    if (secaoRelatorio.style.display === "none" || secaoRelatorio.style.display === "") {
+        secaoRelatorio.style.display = "block"; // Exibe a seção do relatório
+        gerarRelatorio(); // Gera o relatório ao exibir
         btnToggleRelatorio.textContent = "Ocultar Relatório de Registros";
     } else {
-        relatorioDiv.style.display = "none"; // Oculta o relatório
+        secaoRelatorio.style.display = "none"; // Oculta a seção do relatório
         btnToggleRelatorio.textContent = "Ver Relatório de Registros";
     }
 });
 
-// Função para mostrar/ocultar o histórico completo
-const btnToggleHistorico = document.getElementById("btn-toggle-historico");
-const historicoCompletoDiv = document.getElementById("historico-completo");
 
-btnToggleHistorico.addEventListener("click", () => {
-    if (historicoCompletoDiv.style.display === "none") {
-        historicoCompletoDiv.style.display = "block";
-        gerarHistoricoCompleto();
-        btnToggleHistorico.textContent = "Ocultar Histórico Completo";
-    } else {
-        historicoCompletoDiv.style.display = "none";
-        btnToggleHistorico.textContent = "Ver Histórico Completo";
-    }
-});
+// Função para gerar o relatório de registros
+function gerarRelatorio() {
+    const registros = JSON.parse(localStorage.getItem("register")) || [];
+    relatorioDiv.innerHTML = registros.map(reg => `
+        <div class="registro ${reg.observacao ? 'observacao' : ''}">
+            <p>Data: ${reg.data} - Hora: ${reg.hora} - Tipo: ${reg.tipo}</p>
+            <p>Observação: ${reg.observacao || "Sem observação"}</p>
+        </div>
+    `).join("");
+}
 
-// Função para gerar o histórico completo de registros
-function gerarHistoricoCompleto() {
-    const registrosDiv = document.getElementById("registros");
-    registrosDiv.innerHTML = "";
+// Função para gerar o relatório de registros com botões de edição e exclusão
+function gerarRelatorio() {
+    const registros = JSON.parse(localStorage.getItem("register")) || [];
+    const relatorioDiv = document.getElementById("relatorio");
 
-    const registros = getRegisterLocalStorage();
+    relatorioDiv.innerHTML = registros.map((reg, index) => `
+        <div class="registro ${reg.observacao ? 'observacao' : ''}">
+            <p>Data: ${reg.data} - Hora: ${reg.hora} - Tipo: ${reg.tipo}</p>
+            <p>Observação: ${reg.observacao || "Sem observação"}</p>
+            <button onclick="editarRegistro(${index})">Editar</button>
+            <button onclick="excluirRegistro()">Excluir</button>
+        </div>
+    `).join("");
+}
+
+// Função para exibir um alerta ao tentar excluir
+function excluirRegistro() {
+    alert("Este ponto não pode ser excluído.");
+}
+
+// Função para editar um registro
+function editarRegistro(index) {
+    const registros = JSON.parse(localStorage.getItem("register")) || [];
+    const registro = registros[index];
     
-    registros.forEach((reg, index) => {
-        const registroDiv = document.createElement("div");
-        registroDiv.classList.add("registro");
-        if (reg.observacao) {
-            registroDiv.classList.add("observacao");
-        }
-
-        registroDiv.innerHTML = `
-            <p><strong>Data:</strong> ${reg.data} - <strong>Hora:</strong> ${reg.hora} - <strong>Tipo:</strong> ${reg.tipo}</p>
-            <p><strong>Observação:</strong> ${reg.observacao || "Sem observação"}</p>
-            <button onclick="adicionarObservacao(${index})">Adicionar/Editar Observação</button>
-        `;
-        registrosDiv.appendChild(registroDiv);
-    });
-}
-
-// Função para adicionar ou editar observação em um registro
-function adicionarObservacao(index) {
-    const observacao = prompt("Digite uma observação para este registro:");
-    if (observacao !== null) {
-        let registros = getRegisterLocalStorage();
-        registros[index].observacao = observacao;
-        localStorage.setItem("register", JSON.stringify(registros));
-        gerarHistoricoCompleto();
-        alert("Observação adicionada com sucesso!");
+    const novaObservacao = prompt("Edite a observação:", registro.observacao);
+    
+    if (novaObservacao !== null) { // Se o usuário não cancelar
+        registros[index].observacao = novaObservacao;
+        localStorage.setItem("register", JSON.stringify(registros)); // Atualiza o registro no localStorage
+        gerarRelatorio(); // Atualiza o relatório para refletir a edição
+        alert("Observação atualizada com sucesso!");
     }
 }
 
+// Função para calcular a data de corte para o filtro
+function calcularDataCorte(periodo) {
+    const hoje = new Date();
+    if (periodo === 'ultimaSemana') {
+        hoje.setDate(hoje.getDate() - 7);
+    } else if (periodo === 'ultimoMes') {
+        hoje.setMonth(hoje.getMonth() - 1);
+    }
+    return hoje;
+}
 
-// Chamar a função para carregar o histórico ao carregar a página
+// Função para filtrar os registros com base no período
+function filtrarRegistros(periodo) {
+    const dataCorte = calcularDataCorte(periodo); // Data de corte baseada no período
+    const registros = JSON.parse(localStorage.getItem("register")) || [];
+
+    // Filtra os registros com data igual ou posterior à data de corte
+    const registrosFiltrados = registros.filter(reg => {
+        const [dia, mes, ano] = reg.data.split("/").map(Number);
+        const dataRegistro = new Date(ano, mes - 1, dia);
+        return dataRegistro >= dataCorte;
+    });
+
+    gerarRelatorioFiltrado(registrosFiltrados);
+}
+
+// Função para gerar o relatório filtrado
+function gerarRelatorioFiltrado(registros) {
+    const relatorioDiv = document.getElementById("relatorio");
+
+    relatorioDiv.innerHTML = registros.map((reg, index) => `
+        <div class="registro ${reg.observacao ? 'observacao' : ''}">
+            <p>Data: ${reg.data} - Hora: ${reg.hora} - Tipo: ${reg.tipo}</p>
+            <p>Observação: ${reg.observacao || "Sem observação"}</p>
+            <button onclick="editarRegistro(${index})">Editar</button>
+            <button onclick="excluirRegistro()">Excluir</button>
+        </div>
+    `).join("");
+}
+
+// Inicialização ao carregar a página
 window.onload = () => {
+    printCurrentHour();
     gerarRelatorio();
     gerarRelatorioJustificativas();
 };
 
 
 
-
-printCurrentHour();
-setInterval(printCurrentHour, 1000);
