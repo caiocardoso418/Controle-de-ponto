@@ -50,6 +50,27 @@
         <button id="btn-dialog-bater-ponto-antigo">Registrar ponto antigo</button>
         <button id="btn-dialog-fechar-antigo">X</button>
     </dialog>
+    <button id="btn-abrir-justificativa">Justificar ausência</button>
+    <dialog id="dialog-justificativa">
+        <h3>Registrar justificativa de ausência</h3>
+        <textarea id="justificativa-ausencia" placeholder="Escreva a justificativa da ausência"></textarea>
+        <label for="upload-arquivo">Anexar justificativa:</label>
+        <input type="file" id="upload-arquivo">
+        <button id="btn-enviar-justificativa">Enviar justificativa</button>
+        <button id="btn-fechar-justificativa">Cancelar</button>
+    </dialog>
+    
+    <!-- Botão para mostrar/ocultar o relatório -->
+    <button id="btn-toggle-relatorio">Ver Relatório de Registros</button>
+
+    <!-- Div para o relatório de registros -->
+    <div id="relatorio" style="display: none;">
+        <h3>Relatório de Registros</h3>
+    </div>
+
+
+
+    
         
     <script src="js/index.js"></script>
 </body>

@@ -227,6 +227,93 @@ function gerarRelatorio() {
     });
 }
 
+const btnAbrirJustificativa = document.getElementById("btn-abrir-justificativa");
+const dialogJustificativa = document.getElementById("dialog-justificativa");
+const btnFecharJustificativa = document.getElementById("btn-fechar-justificativa");
+const btnEnviarJustificativa = document.getElementById("btn-enviar-justificativa");
+
+// Evento para abrir o diálogo de justificativa
+btnAbrirJustificativa.addEventListener("click", () => {
+    dialogJustificativa.showModal();
+});
+
+// Evento para fechar o diálogo de justificativa
+btnFecharJustificativa.addEventListener("click", () => {
+    dialogJustificativa.close();
+});
+
+// Evento para enviar a justificativa
+btnEnviarJustificativa.addEventListener("click", () => {
+    const justificativa = document.getElementById("justificativa-ausencia").value;
+    const arquivo = document.getElementById("upload-arquivo").files[0]; // Pega o arquivo carregado
+
+    if (!justificativa || !arquivo) {
+        alert("Por favor, forneça uma justificativa e anexe um arquivo.");
+        return;
+    }
+
+    // Salvando a justificativa e o arquivo no LocalStorage (ou backend)
+    const justificativaAusencia = {
+        "data": getCurrentDate(),
+        "hora": getCurrentHour(),
+        "justificativa": justificativa,
+        "arquivo": arquivo.name // Armazena apenas o nome do arquivo para visualização
+    };
+
+    // Adiciona a justificativa ao LocalStorage (poderia ser enviado a um backend)
+    let justificativas = JSON.parse(localStorage.getItem("justificativas")) || [];
+    justificativas.push(justificativaAusencia);
+    localStorage.setItem("justificativas", JSON.stringify(justificativas));
+
+    alert("Justificativa registrada com sucesso!");
+    dialogJustificativa.close();
+});
+
+function gerarRelatorioJustificativas() {
+    const justificativasDiv = document.getElementById("relatorio-justificativas");
+    justificativasDiv.innerHTML = ""; // Limpa o conteúdo atual
+
+    const justificativas = JSON.parse(localStorage.getItem("justificativas")) || [];
+    
+    justificativas.forEach(justif => {
+        const justificativaDiv = document.createElement("div");
+        justificativaDiv.classList.add("justificativa");
+        
+        justificativaDiv.innerHTML = `
+            <p>Data: ${justif.data} - Hora: ${justif.hora}</p>
+            <p>Justificativa: ${justif.justificativa}</p>
+            <p>Arquivo: ${justif.arquivo}</p>
+        `;
+
+        justificativasDiv.appendChild(justificativaDiv);
+    });
+}
+
+const btnToggleRelatorio = document.getElementById("btn-toggle-relatorio");
+const relatorioDiv = document.getElementById("relatorio");
+
+btnToggleRelatorio.addEventListener("click", () => {
+    // Verifica se o relatório está oculto
+    if (relatorioDiv.style.display === "none" || relatorioDiv.style.display === "") {
+        relatorioDiv.style.display = "block"; // Exibe o relatório
+        gerarRelatorio(); // Gera o relatório apenas quando é exibido
+        btnToggleRelatorio.textContent = "Ocultar Relatório de Registros";
+    } else {
+        relatorioDiv.style.display = "none"; // Oculta o relatório
+        btnToggleRelatorio.textContent = "Ver Relatório de Registros";
+    }
+});
+
+
+
+// Chamar a função para carregar o histórico ao carregar a página
+window.onload = () => {
+    gerarRelatorio();
+    gerarRelatorioJustificativas();
+};
+
+
+
 
 printCurrentHour();
 setInterval(printCurrentHour, 1000);
